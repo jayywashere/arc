@@ -4,21 +4,28 @@ pub mod runtime;
 
 #[cfg(test)]
 mod tests {
-    use crate::{builder::BytecodeBuilder, bytecode::Opcode, runtime::{Value, vm::Vm}};
+    use crate::{
+        builder::BytecodeBuilder,
+        bytecode::Opcode,
+        runtime::{Value, vm::Vm},
+    };
 
     fn assert_vm_output(builder: &mut BytecodeBuilder, expected: Value) {
         let bytecode = builder.finish_and_reset();
         let mut vm = Vm::new(bytecode);
 
         vm.run().unwrap();
+
         assert_eq!(vm.peek(), Some(&expected));
     }
 
     #[test]
     fn all() {
         let mut builder = BytecodeBuilder::new();
-        
+
         print_int(&mut builder);
+        debug_print_int(&mut builder);
+
         add_ints(&mut builder);
         sub_ints(&mut builder);
         mul_ints(&mut builder);
@@ -33,8 +40,20 @@ mod tests {
             .op(Opcode::Halt);
 
         let bytecode = builder.finish_and_reset();
-
         let mut vm = Vm::new(bytecode);
+
+        vm.run().unwrap();
+    }
+
+    fn debug_print_int(builder: &mut BytecodeBuilder) {
+        builder
+            .ldc(Value::Int(42))
+            .op(Opcode::DebugPrint)
+            .op(Opcode::Halt);
+
+        let bytecode = builder.finish_and_reset();
+        let mut vm = Vm::new(bytecode);
+
         vm.run().unwrap();
     }
 
@@ -84,7 +103,7 @@ mod tests {
             .ldc(Value::Int(5))
             .op(Opcode::Rem)
             .op(Opcode::Halt);
-    
+
         assert_vm_output(builder, Value::Int(2));
     }
 }

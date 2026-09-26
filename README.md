@@ -19,7 +19,7 @@ i made this mainly to practice working with:
 
 the main idea is for ARC to act as a reusable runtime for different frontends and languages.
 
-for example, a future language such as `TASM` (a frontend i'll be making soon) could compile its instructions into ARC bytecode and let ARC handle the actual execution.
+for example, a future language such as `TASM` (a frontend i'll be making soon) could compile its instructions into ARC bytecode and let ARC handle the actual execution. (AND `Spark` AS WELL!!!)
 
 ## Features
 
@@ -33,23 +33,30 @@ for example, a future language such as `TASM` (a frontend i'll be making soon) c
 - runtime error handling (`runtime::RuntimeError`)
 - bytecode builder API
 - method chaining because writing everything manually gets old very quickly and that can cause my brain to deteriorate at the speed of light
+- `Print` and `DebugPrint` opcodes
+- MORE runtime error handling (`runtime::RuntimeError`)
+- `.arx` bytecode binaries
+- bytecode serialization and deserialization
+- bytecode builder API
+- runtime values! new one is `Char`: (`Int`, `Float`, `Bool`, `Char`, and `String`)
 
 ## Supported Instructions
 
-| **Instruction** | **Operation**                        |
-| --------------- | ------------------------------------ |
-| `Halt`          | stops execution                      |
-| `Ldc`           | loads a constant onto the stack      |
-| `Pop`           | removes the top value from the stack |
-| `Dup`           | duplicates the top value             |
-| `Add`           | addition                             |
-| `Sub`           | subtraction                          |
-| `Mul`           | multiplication                       |
-| `Div`           | division                             |
-| `Rem`           | modulo                               |
-| `Print`         | prints and removes the top value     |
+| **Instruction** | **Operation**                                                     |
+| --------------- | ----------------------------------------------------------------- |
+| `Halt`          | stops execution                                                   |
+| `Ldc`           | loads a constant onto the stack                                   |
+| `Pop`           | removes the top value from the stack                              |
+| `Dup`           | duplicates the top value                                          |
+| `Add`           | addition                                                          |
+| `Sub`           | subtraction                                                       |
+| `Mul`           | multiplication                                                    |
+| `Div`           | division                                                          |
+| `Rem`           | modulo                                                            |
+| `Print`         | prints and removes the top value using its display representation |
+| `DebugPrint`    | prints and removes the top value using its debug representation   |
 
-(wasted most of my dang time centering and formatting this freaking table just to find out that markdown formats the final look perfectly.)
+(wasted most of my dang time centering and formatting this freaking table just to find out that markdown formats the final look perfectly.....)
 
 ## How It Works
 
@@ -116,7 +123,7 @@ vm.run().unwrap();
 the output will show:
 
 ```text
-Int(30)
+10
 ```
 
 ## Why I Made This
@@ -141,16 +148,13 @@ scroll. up.
 
 more features may be added soon, such as:
 
-- better value printing
 - comparisons
 - control flow
-- paradigms
 - boolean operations
 - variables
 - functions
 - call frames
 - memory
-- a more complete bytecode format
 - a frontend language that targets ARC
 
 ## Related Projects
@@ -163,28 +167,55 @@ ARC itself is not tied to `TASM` or to assembly-like languages; i intend to desi
 
 ## Requirements
 
+in general:
+
 - Rust
 - Cargo
+
+including the development launcher:
+
+- Bash
 
 ## Running
 
 clone the lovely repository:
 
-```powershell
+```bash
 git clone https://github.com/jayywashere/arc
 cd arc
 ```
 
 run the tests (optional):
 
-```powershell
+```bash
 cargo test
 ```
 
 to display printed output from tests:
 
-```powershell
+```bash
 cargo test -- --nocapture
+```
+
+furthermore, we have `arc.sh`!! which means we can use this to, uhm, do CLI thingies,.. YOU'LL SEE WHAT I MEAN.
+
+available commands rn:
+
+```bash
+arc help
+arc run <.arx binary>
+```
+
+to view all available commands and their usage format:
+
+```bash
+arc help
+```
+
+to run a `.arx` binary:
+
+```bash
+arc run <.arx binary>
 ```
 
 ## License

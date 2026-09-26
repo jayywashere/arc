@@ -20,6 +20,7 @@ pub enum Opcode {
 
     // I/O: 0x40–0x4F
     Print = 0x40,
+    DebugPrint = 0x41,
 }
 
 impl TryFrom<u8> for Opcode {
@@ -41,6 +42,7 @@ impl TryFrom<u8> for Opcode {
             0x34 => Ok(Self::Rem),
 
             0x40 => Ok(Self::Print),
+            0x41 => Ok(Self::DebugPrint),
             
             _ => Err(byte),
         }

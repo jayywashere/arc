@@ -19,16 +19,21 @@ impl Vm {
 
     pub fn run(&mut self) -> Result<(), RuntimeError> {
         loop {
-            let opcode = Opcode::try_from(self.read_byte())
-                .expect("Invalid Opcode.");
+            let byte = self.read_byte()?;
+            let opcode = Opcode::try_from(byte)
+                .map_err(|_| RuntimeError::InvalidOpcode(byte))?;
 
             match opcode {
                 Opcode::Halt => break,
 
                 Opcode::Ldc => {
-                    let idx = self.read_u32() as usize;
+                    let idx = self.read_u32()? as usize;
 
-                    let val = self.bytecode.constants[idx].clone();
+                    let val = self.bytecode.constants
+                        .get(idx)
+                        .cloned()
+                        .ok_or(RuntimeError::InvalidConstantIndex(idx as u32))?;
+
                     self.stack.push(val);
                 }
 
@@ -61,11 +66,17 @@ impl Vm {
                     )?
                 }
 
-                Opcode::Print => {
-                    let value = self.stack.pop()
-                        .ok_or(RuntimeError::StackUnderflow);
+                Opcode::Print | Opcode::DebugPrint => {
+                    let value = self.stack
+                        .pop()
+                        .ok_or(RuntimeError::StackUnderflow)?;
 
-                    println!("{value:?}");
+                    let output: String = if opcode == Opcode::Print {
+                        format!("{value}")
+                    } else {
+                        format!("{value:?}")
+                    };
+                    println!("{output}");
                 }
             }
         }
@@ -163,21 +174,24 @@ impl Vm {
         Ok((a, b))
     }
 
-    fn read_byte(&mut self) -> u8 {
-        let byte = self.bytecode.code[self.pc];
+    fn read_byte(&mut self) -> Result<u8, RuntimeError> {
+        let byte = *self.bytecode.code
+            .get(self.pc)
+            .ok_or(RuntimeError::UnexpectedEndOfBytecode)?;
+
         self.pc += 1;
-        byte
+        Ok(byte)
     }
 
-    fn read_u32(&mut self) -> u32 {
+    fn read_u32(&mut self) -> Result<u32, RuntimeError> {
         let bytes = [
-            self.read_byte(),
-            self.read_byte(),
-            self.read_byte(),
-            self.read_byte(),
+            self.read_byte()?,
+            self.read_byte()?,
+            self.read_byte()?,
+            self.read_byte()?,
         ];
 
-        u32::from_le_bytes(bytes)
+        Ok(u32::from_le_bytes(bytes))
     }
 
     pub fn stack(&self) -> &[Value] {
